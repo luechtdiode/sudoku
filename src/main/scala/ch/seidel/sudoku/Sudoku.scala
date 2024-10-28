@@ -1,6 +1,7 @@
 package ch.seidel.sudoku
 
 import java.io.{BufferedWriter, File, PrintWriter}
+import java.nio.file.{Files, Path}
 
 
 /**
@@ -389,7 +390,16 @@ object Sudoku {
         case x => x
       }
     }
-    val fileName = "input/sudoku.txt"
+    if (args.length == 0) {
+      println("Missing inputfile argument");
+      System.exit(99)
+    }
+    val filepath = Path.of(args(0))
+    if (!Files.exists(filepath)) {
+      println(s"unable to find ${filepath.toAbsolutePath.toString}");
+      System.exit(99)
+    }
+    val fileName = filepath.toAbsolutePath.toString
     println(s"reading input from $fileName ...")
     val bufferedSource = scala.io.Source.fromFile(fileName)
     val grid = bufferedSource.getLines()

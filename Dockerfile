@@ -7,29 +7,18 @@ RUN echo "sudoku:x:1497:1495:user for sudoku:/home:/bin/false" >> /etc/passwd
 RUN echo "sudoku:!:1495:" >> /etc/group
 
 WORKDIR /sudoku/
-RUN chown sudoku:sudoku /sudoku
+RUN mkdir /sudoku/input
+RUN mkdir /sudoku/output
+RUN chown -R sudoku:sudoku /sudoku
 RUN mkdir /home/sudoku
 RUN chown sudoku:sudoku /home/sudoku
 RUN chmod -R g+rwx /home/sudoku
 
-COPY --chown=sudoku:sudoku *.jar /sudoku/app.jar
+COPY --chown=sudoku:sudoku target/*.jar /sudoku/app.jar
+COPY --chown=sudoku:sudoku target/dependency /sudoku/libs
 
-CMD [ "java", "-cp", ".:app.jar" \
-    , "-server" \
-    , "--add-opens=java.base/java.io=ALL-UNNAMED" \
-    , "--add-opens=java.base/java.util=ALL-UNNAMED" \
-    , "--add-opens=java.base/java.lang=ALL-UNNAMED" \
-    , "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED" \
-    , "--add-opens=java.base/java.net=ALL-UNNAMED" \
-    , "--add-opens=java.base/java.nio=ALL-UNNAMED" \
-    , "--add-opens=java.base/java.time=ALL-UNNAMED" \
-    , "--add-opens=java.base/java.util=ALL-UNNAMED" \
-    , "--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED" \
-    , "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED" \
-    , "--add-opens=java.base/sun.util.calendar=ALL-UNNAMED" \
-    , "-XX:+UseZGC" \
-    , "-XX:+ZGenerational" \
-    , "-XX:MaxRAMPercentage=75.0" \
-    , "-XX:+ExitOnOutOfMemoryError" \
-    , "-XshowSettings:vm -version" \
-    , "ch.seidel.sudoku.Sudoku"]
+
+ENTRYPOINT [ "java", "-cp", ".:app.jar:libs/*", "ch.seidel.sudoku.Sudoku"]
+
+# build with docker build -t sudoku:test .
+# Run with docker run --rm -it -v $(pwd)/input:/sudoku/input sudoku:test /sudoku/input/sudoku.txt
