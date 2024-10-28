@@ -1,5 +1,8 @@
 package ch.seidel.sudoku
 
+import java.io.{BufferedWriter, File, PrintWriter}
+
+
 /**
  * After Martin Odersky's introduction into Scala FP at Coursera, this is a
  * decent repetition of all that immutable, streamy and functional stuff.
@@ -379,5 +382,34 @@ object Sudoku {
   }
   
   def main(args: Array[String]): Unit = {
+    def toCell(x: String): Char = {
+      val digits = ('0' to '9').toList
+      x.charAt(0) match {
+        case x if digits.contains(x) => digits.indexOf(x).toChar
+        case x => x
+      }
+    }
+    val fileName = "input/sudoku.txt"
+    println(s"reading input from $fileName ...")
+    val bufferedSource = scala.io.Source.fromFile(fileName)
+    val grid = bufferedSource.getLines()
+      .map(line => line.split("\\|").map(toCell).toList)
+      .toList
+
+    bufferedSource.close()
+
+    val solver = Solver(grid)
+    println(solver.givenGrid)
+
+    println("input completed, start with solver ...")
+
+    solver.solve.zipWithIndex.foreach(solution => {
+      val (grid, index) = solution
+      println(s"writing solution $index to output/solution-$index.txt")
+      val bufferedPrintWriter = new BufferedWriter(new PrintWriter(new File(s"output/solution-$index.txt")))
+      bufferedPrintWriter.write(grid.toString)
+      bufferedPrintWriter.close()
+      println(grid)
+    })
   }
 }
