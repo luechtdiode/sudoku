@@ -37,7 +37,7 @@ jobs:
         distribution: 'temurin'
         cache: 'maven'
     - name: Compile Test and Package
-      run: maven clean install package
+      run: mvn clean install package
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
     - name: Log in to the Container registry
