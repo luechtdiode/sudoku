@@ -407,7 +407,8 @@ object Sudoku {
     println(s"reading input from $fileName ...")
     val bufferedSource = scala.io.Source.fromFile(fileName)
     val grid = bufferedSource.getLines()
-      .map(line => line.split("\\|").map(toCell).toList)
+      .filter(line => !line.startsWith("+"))
+      .map(line => line.replace(' ' ,'0').split("\\|").filter(cell => cell.trim.nonEmpty).map(toCell).toList)
       .toList
 
     bufferedSource.close()
