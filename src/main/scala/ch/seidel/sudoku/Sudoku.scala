@@ -390,8 +390,12 @@ object Sudoku {
         case x => x
       }
     }
-    if (args.length == 0) {
+    if (args.length < 1) {
       println("Missing inputfile argument");
+      System.exit(99)
+    }
+    if (args.length < 2) {
+      println("Missing outputdir argument");
       System.exit(99)
     }
     val filepath = Path.of(args(0))
@@ -415,8 +419,10 @@ object Sudoku {
 
     solver.solve.zipWithIndex.foreach(solution => {
       val (grid, index) = solution
-      println(s"writing solution $index to output/solution-$index.txt")
-      val bufferedPrintWriter = new BufferedWriter(new PrintWriter(new File(s"output/solution-$index.txt")))
+      val source = filepath.getFileName.toString
+      val outfile = Path.of(s"${args(1)}/$source-solution-$index.txt").toAbsolutePath
+      println(s"writing solution $index to $outfile")
+      val bufferedPrintWriter = new BufferedWriter(new PrintWriter(outfile.toFile))
       bufferedPrintWriter.write(grid.toString)
       bufferedPrintWriter.close()
       println(grid)
